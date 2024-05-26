@@ -1,0 +1,32 @@
+#!/bin/bash
+
+MYSQL_DATABASE=wordpress
+MYSQL_USER=mysql
+
+chown -R mysql:mysql /var/run/mysqld
+chown -R mysql:mysql /var/lib/mysql
+
+if [ ! -d /var/lib/mysql/$MYSQL_DATABASE ]; then
+	mysql_install_db
+	
+	TMP=$(mktemp)
+	echo "
+	USE mysql;
+	FLUSH PRIVILEGES;
+	GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY $MYSQL_ROOT_PASSWORD;
+	GRANT OPTION TO 'root'@'%' IDENTIFIED BY $MYSQL_ROOT_PASSWORD;
+	FLUSH PRIVILEGES;
+	CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;i
+	FLUSH PRIVILEGES;
+	CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY $MYSQL_PASSWORD;
+	GRANT ALL PRIVILEGES ON '$MYSQL_DATABASE'.* TO '$MYSQL_USER'@'%';
+	FLUSH PRIVILEGES;
+	EOF
+	" > $TMP
+
+	mysqld < $TMP
+	cat $TMP
+	rm -f $TMP
+fi
+
+mysqld
