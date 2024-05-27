@@ -8,9 +8,6 @@ chown -R mysql:mysql /var/lib/mysql
 if [ ! -d /var/lib/mysql/$MYSQL_DATABASE ]; then
 	mysql_install_db
 
-	mysqld &
-       	sleep 2
-	
 	TMP=tmp.txt
 	touch $TMP
 	echo "
@@ -26,9 +23,6 @@ if [ ! -d /var/lib/mysql/$MYSQL_DATABASE ]; then
 
 	mysql < $TMP
 	rm -f $TMP
-
-	fg %1
-	exit 0
 fi
 
 mysqld
